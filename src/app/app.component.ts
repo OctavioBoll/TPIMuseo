@@ -180,11 +180,9 @@ export class AppComponent {
   }
 
 
-  
-  
-
-  iniciaSesion(){
+  nuevaVentaEntrada(){
     this.pantalla = 'B'
+    //getEmpleadoEnSesion
     this.auxSesionSelect.push(this.sesion[0])
     console.log(this.auxSesionSelect[0].idUsuario)
     this.buscarUsuario(this.auxSesionSelect[0].idUsuario)
@@ -192,13 +190,13 @@ export class AppComponent {
   }
 
   buscarUsuario(id){
+    
     for (let index = 0; index < this.usuario.length; index++) {
       console.log(this.usuario[index].id)
+      //buscar en todos los usuarios el usuario con idUsuario de sesion
       if(id == this.usuario[index].id){
-        console.log('id',id)
-
+        //guardar el usuario que tiene la sesion
         this.auxUsuarioSelect.push(this.usuario[index]);
-        console.log('usuario select',this.usuario[index].id)
       }
     }
 
@@ -208,10 +206,9 @@ export class AppComponent {
   //conocerEmpleado()
   buscarEmpleado(){
     for (let index = 0; index < this.empleado.length; index++) {
+      //buscar en todos los empleados el empleado que tiene el idEmpleado de usuario seleccionado
       if(this.auxUsuarioSelect[0].idEmpleado == this.empleado[index].id){
-        console.log(' buscarEmpleado idEmpleado del usuario',this.auxUsuarioSelect[0].idEmpleado)
         this.auxEmpleadoSelect.push(this.empleado[index])
-        console.log('empleado select',this.empleado[index])
       }
     }
 
@@ -220,14 +217,16 @@ export class AppComponent {
   //buscarSedeEmpleado()
   buscarSede(){
     for (let index = 0; index < this.sede.length; index++) {
+      //buscar en todas las sedes la sede con idSede de empleado 
       if(this.auxEmpleadoSelect[0].idSede == this.sede[index].id){
+        //seleccionar sede
         this.auxSedeSelect.push(this.sede[index])
-        console.log('Sede',this.auxSedeSelect[0])
       }
     }
     this.buscarTarifaVigentes()
   }
 
+  //getFecha()
   fecha(){
     var fecha = new Date()
     var fechaActual = ""
@@ -242,10 +241,10 @@ export class AppComponent {
     }
     fechaActual = dia + "/" + mes + "/" + año;
     return fechaActual
-
   }
-  hora(){
 
+  //getHora()
+  hora(){
     var tiempo = new Date()
     var horaActual = ""
     var hora = tiempo.getHours().toString();
@@ -255,84 +254,94 @@ export class AppComponent {
     return horaActual
   }
 
+  //
   buscarTarifaVigentes(){
     let fechas = new Date();
     let hora = this.hora();
+
+
     console.log('buscarTarifavigentes', this.tarifa[0])
 
+    //Buscar en todas las tarifas
     for (let index = 0; index < this.tarifa.length; index++) {
 
+      //De las tarifas buscar dia inicio, mes inicio y año inicio
       let diaIn = parseInt(this.tarifa[index].fechaInicioVigencia.slice(0,2))
       let mesIn = parseInt(this.tarifa[index].fechaInicioVigencia.slice(3,5))
       let añoIn =  parseInt(this.tarifa[index].fechaInicioVigencia.slice(6,10))
       
-
+      //De las tarifas buscar dia vencimiento, mes vencimiento, año vencimiento
       let diaVen = parseInt(this.tarifa[index].fechaFinVigencia.slice(0,2))
       let mesVen = parseInt(this.tarifa[index].fechaFinVigencia.slice(3,5))
       let añoVen =  parseInt(this.tarifa[index].fechaFinVigencia.slice(6,10))
       
-
-      
-      console.log('fecha',this.tarifa[index].fechaFinVigencia)
-      //&&(this.tarifa[index].fechaInicioVigencia <= fechas && fechas <=this.tarifa[index].fechaInicioVigencia
+      //Buscar y guardar la tarifa que pertenezca a la sede seleccionada y que este entre las fechas vigentes
       if((this.auxSedeSelect[0].id == this.tarifa[index].idSede) && 
         (añoIn <= fechas.getFullYear() && mesIn <= (fechas.getMonth()+1) && diaIn <= fechas.getDate()) && 
         (añoVen >= fechas.getFullYear() && mesVen >= (fechas.getMonth()+1) && diaVen >= fechas.getDate())){
-        this.auxTarifaSelect.push(this.tarifa[index])
-        console.log("tarifas vigentes" , this.auxTarifaSelect)
+        //Guardar las tarifas Disponibles
+        //auxTarifaSelect Tarifas disponibles
+          this.auxTarifaSelect.push(this.tarifa[index])
+        
       } 
     }
   }
 
-  
+  //Seleccion de la tarifa que Desea comprar
   tomarSeleccionTarifa(id){
     this.pantalla = 'C'
-    console.log('tomarSelecTarifa',id)
+    //Buscar en todas las tarifas disponibles y guardar la tarifa seleccionada
     for (let index = 0; index < this.auxTarifaSelect.length; index++) {
       if (id == this.auxTarifaSelect[index].id) {
+        //auxTarifaDos Tarifa seleccionada 
         this.auxTarifaDos.push(this.auxTarifaSelect[index])
         console.log("auxTarifaDos",this.auxTarifaDos)
       }
     }
+    //Guardar la Duracion Completa de las obras de la sede dividido 60 para convertirlo en horas
     this.auxCantDuracion =  this.calcularDuracionEstimadaCompleta() / 60
 
+    //Guardar la Cantidad disponible de entradas para la Sede
     this.auxCantEntradaVendidas += this.buscarReservasSedeActual()
     this.auxCantEntradaVendidas += this.buscarEntradasSedeActual()
-
-
     this.auxCantEntradaDispo = this.auxSedeSelect[0].cantMaxVisitates - this.auxCantEntradaVendidas;
-    console.log(this.auxCantEntradaVendidas)
-    console.log(this.auxSedeSelect[0].cantMaxVisitates)
-    console.log(this.auxCantEntradaDispo)
+    
+   //Resetear variable de por si se vuelve para atras 
     this.auxCantEntradaVendidas = 0
     
 
   }
 
   calcularDuracionEstimadaCompleta(){
+    
     let fechas = new Date();
     let canDuracionEstimada = 0;
+    //Buscar en todas las exposiciones 
     for (let indexUno = 0; indexUno < this.exposicion.length; indexUno++) {
 
+      //Guardar el dia inicio, mes inicio, año inicio de la exposicion
       let diaIn = parseInt(this.exposicion[indexUno].fechaInicio.slice(0,2))
       let mesIn = parseInt(this.exposicion[indexUno].fechaInicio.slice(3,5))
       let añoIn = parseInt(this.exposicion[indexUno].fechaInicio.slice(6,10))
       
-
+      //Guardar el dia fin, mes fin, año fin de la exposicion
       let diaVen = parseInt(this.exposicion[indexUno].fechaFin.slice(0,2))
       let mesVen = parseInt(this.exposicion[indexUno].fechaFin.slice(3,5))
       let añoVen = parseInt(this.exposicion[indexUno].fechaFin.slice(6,10))
 
-
+      //de la exposicion que pertenece a la sede seleccionada y que tenga fecha entre el inicio y fin de la exposicion
       if ((this.auxSedeSelect[0].id = this.exposicion[indexUno].idSede) &&
           (añoIn <= fechas.getFullYear() && mesIn <= (fechas.getMonth()+1) && diaIn <= fechas.getDate()) && 
           (añoVen >= fechas.getFullYear() && mesVen >= (fechas.getMonth()+1) && diaVen >= fechas.getDate())) {
-        console.log(this.exposicion[indexUno])
+        
+        //Buscar en todas las exposiciones el detalleExposicion
         for (let indexDos = 0; indexDos < this.detalleExposicion.length; indexDos++) {
           if(this.detalleExposicion[indexDos].idExposicion = this.exposicion[indexUno].id)
-
+            
+          //Buscar en el Detalle Exposicion todas las obras
           for (let indexTres = 0; indexTres < this.obra.length; indexTres++) {
             if (this.obra[indexTres].id = this.detalleExposicion[indexDos].idObra) {
+              //Guardar la Duracion extendida de obra que tenga exposicion vigente en la sede seleccionada
               canDuracionEstimada += this.obra[indexTres].duracionExtendida;
             } 
           } 
@@ -342,34 +351,26 @@ export class AppComponent {
     return canDuracionEstimada
   }
 
-  buscarLimiteVisitantes(){
-    let limiteVisitantes = this.auxSedeSelect[0].cantMaxVisitates
-  }
 
   buscarReservasSedeActual(){
     let fecha = new Date;
+
     let countCantReservas = 0;
+
+    //de Todas las Reservas 
     for (let index = 0; index < this.reservaVisita.length; index++) {
 
+      // Traer el dia, mes y año de la reserva
       let diaIn = parseInt(this.reservaVisita[index].fechaHoraReserva.slice(0,2))
       let mesIn = parseInt(this.reservaVisita[index].fechaHoraReserva.slice(3,5))
       let añoIn = parseInt(this.reservaVisita[index].fechaHoraReserva.slice(6,10))
-      
-      console.log('fechaHorareserva',this.reservaVisita[index].fechaHoraReserva)
-      console.log(diaIn)
-      console.log(mesIn)
-      console.log(añoIn)
 
-      //let diaVen = parseInt(this.exposicion[index].fechaFin.slice(0,2))
-      //let mesVen = parseInt(this.exposicion[index].fechaFin.slice(3,5))
-      //let añoVen = parseInt(this.exposicion[index].fechaFin.slice(6,10))
-
-      //this.reservaVisita[index].fechaHoraReserva = fecha
-      console.log(this.reservaVisita[index])
+      //buscar las reservas de la sede seleccionada con el dia, mes y año del dia actual
       if ((this.auxSedeSelect[0].id = this.reservaVisita[index].idSede) &&
           (añoIn == fecha.getFullYear() && mesIn == (fecha.getMonth()+1) && diaIn == fecha.getDate())){
-            
-         countCantReservas += 1
+        
+        //Sumar si hay una reserva 
+        countCantReservas += 1
       }
     }
     return countCantReservas
@@ -378,13 +379,15 @@ export class AppComponent {
   buscarEntradasSedeActual(){
     let fecha = new Date;
     let countCantEntrada = 0;
+    //buscar en todas las entradas
     for (let index = 0; index < this.entrada.length; index++) {
-
+      
+      //Guardar dia mes y año de la venta de la entrada
       let diaIn = parseInt(this.entrada[index].fechaVenta.slice(0,2))
       let mesIn = parseInt(this.entrada[index].fechaVenta.slice(3,5))
       let añoIn = parseInt(this.entrada[index].fechaVenta.slice(6,10))
 
-
+      //buscar entradas de la sede seleccionada y con fecha igual al dia de la venta
       if ((this.auxSedeSelect[0].id = this.entrada[index].idSede) && 
           (añoIn == fecha.getFullYear() && mesIn == (fecha.getMonth()+1) && diaIn == fecha.getDate())) { 
 
@@ -396,45 +399,35 @@ export class AppComponent {
 
 
   DetalleEntradas(){
+    //Mostrar Pantalla con detalle de las entradas
     this.pantalla = "D"
 
+    //auxCantEntradas variable guardada en la pantalla cantidad de entradas
     for (let index = 0; index < this.auxCantEntradas; index++) {
 
-      console.log("index",index)
-      
+      //guardar la cantidad de tarifas segun la cantidad seleccionada
       this.auxCantTarifaSelect.push(this.auxTarifaDos[0])
-      console.log("auxEntradaSelect",this.auxCantTarifaSelect)
-      
     }
-
-    
-    
   }
 
+  //selecciona la opcion Comprar en la pantalla Detalle de las entradas
   ComprarEntradas(){
     
-    
+    //de toda la coleccion de tarifa con la cantidad seleccionada
     for (let index = 0; index < this.auxCantTarifaSelect.length; index++) { 
       
-      console.log("monto total",this.auxCantTarifaSelect[index].monto + this.auxCantTarifaSelect[index].montoAdicionalGuia)
       let precio = 0
-      console.log("guia select",this.guia_select)
+      
+      //si selecciona con guia calcular el precio con monto adicional con guia
       if (this.guia_select == true) {
         precio = this.auxCantTarifaSelect[index].monto + this.auxCantTarifaSelect[index].montoAdicionalGuia
-        console.log("auxCant",this.auxCantTarifaSelect[index].monto)
-        console.log("precio",precio)
       }
+      //si no selecciona con guia calcular el precio sin monto adicional
       else {
-        
           precio = this.auxCantTarifaSelect[index].monto 
-          
-          console.log("precio",precio)
-          console.log("auxCant",this.auxCantTarifaSelect[index].monto)
-  
-        
       }
       
-      
+      //guardar en una variable los datos de la entrada de la tarifa seleccionada
       const entradaSelect: Entrada = {
         numero:0,
         idSede:this.auxCantTarifaSelect[index].idSede,
@@ -444,8 +437,7 @@ export class AppComponent {
         monto: precio
       }
         
-      
-
+      //PUT a la base de datos la entrada la cantidad de veces del for de la cantidad seleccionada
       console.log("auxEntradaSelect",entradaSelect)
       this._entradaService.guardarEntrada(entradaSelect).subscribe(data =>{
         console.log(data)
