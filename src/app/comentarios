@@ -1,3 +1,13 @@
+auxTipoEntradaSelect: TipoEntrada[] = [];
+  auxTipoVisitaSelect: TipoVisita[] = [];
+  auxExposicionSelect: Exposiciones[] = [];
+  auxDetalleExposicionSelect: DetalleExposicion[] = [];
+  auxObraSelect: Obra[] = [];
+  auxReservaVisitaSelect: ReservasVisita[] = [];
+  auxEntradaSelect: any[] = []; 
+ 
+ 
+ 
  /*ComprarEntradas(){
     
     //de toda la coleccion de tarifa con la cantidad seleccionada

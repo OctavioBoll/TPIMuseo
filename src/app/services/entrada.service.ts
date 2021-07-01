@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Entrada } from '../models/entradaModel';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,6 @@ export class EntradaService {
   }
 
   guardarEntrada(entrada:any): Observable<any>{
-    return this.http.post(this.myAppUrl + this.myApiUrl, entrada)
+    return this.http.post(this.myAppUrl + this.myApiUrl,entrada)
   }
 }

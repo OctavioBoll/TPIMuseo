@@ -1,18 +1,17 @@
-import { getAttrsForDirectiveMatching } from '@angular/compiler/src/render3/view/util';
-import { Component,OnInit } from '@angular/core';
-//import { count } from 'console';
-//import { DetalleExposicion } from './models/detalleExposicionModel';
-//import { Empleado } from './models/empleadoModel';
-//import { Entrada } from './models/entradaModel';
-//import { Exposiciones } from './models/exposicionModel';
-//import { Obra } from './models/obraModel';
-//import { ReservasVisita } from './models/reservaVisitaModel';
-//import { Sede } from './models/sedeModel';
-//import { Sesion } from './models/sesionModel';
-//import { Tarifa } from './models/tarifaModel';
+import { Component, OnInit } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { DetalleExposicion } from './models/detalleExposicionModel';
+import { Empleado } from './models/empleadoModel';
+import { Entrada } from './models/entradaModel';
+import { Exposiciones } from './models/exposicionModel';
+import { Obra } from './models/obraModel';
+import { ReservasVisita } from './models/reservaVisitaModel';
+import { Sede } from './models/sedeModel';
+import { Sesion } from './models/sesionModel';
+import { Tarifa } from './models/tarifaModel';
 import { TipoEntrada } from './models/tipoEntradaModel';
 import { TipoVisita } from './models/tipoVisitaModel';
-//import { Usuario } from './models/usuarioModel';
+import { Usuario } from './models/usuarioModel';
 import { DetalleExposicionService } from './services/detalle-exposicion.service';
 import { EmpleadoService } from './services/empleado.service';
 import { EntradaService } from './services/entrada.service';
@@ -25,7 +24,7 @@ import { TarifaService } from './services/tarifa.service';
 import { TipoEntradaService } from './services/tipo-entrada.service';
 import { TipoVisitaService } from './services/tipo-visita.service';
 import { UsuarioService } from './services/usuario.service';
-
+import swal from 'sweetalert2';
 
 @Component({
   selector: 'app-root',
@@ -35,73 +34,57 @@ import { UsuarioService } from './services/usuario.service';
 export class AppComponent {
   title = 'CU102RegistrarEntradas';
 
-  sesion:Sesion[] = [];
-  usuarios:Usuario[] = [];
-  empleado:Empleado [] = [];
-  sede:Sede [] = [];
-  tarifa:Tarifa[] = [];
-  tipoEntrada:TipoEntrada[] = [];
-  tipoVisita:TipoVisita[] = [];
-  exposicion:Exposiciones[] = [];
-  detalleExposicion:DetalleExposicion[] =[];
-  obra:Obra[] = [];
-  reservaVisita:ReservasVisita[] = [];
-  entrada:Entrada[] = [];
+  //Variables para guardar las tablas de las funciones obtener()
+  sesion: Sesion[] = [];
+  usuarios: Usuario[] = [];
+  empleado: Empleado[] = [];
+  sede: Sede[] = [];
+  tarifa: Tarifa[] = [];
+  tipoEntrada: TipoEntrada[] = [];
+  tipoVisita: TipoVisita[] = [];
+  exposicion: Exposiciones[] = [];
+  detalleExposicion: DetalleExposicion[] = [];
+  obra: Obra[] = [];
+  reservaVisita: ReservasVisita[] = [];
+  entrada: Entrada[] = [];
 
-  auxSesionSelect:Sesion[] = [];
-  auxUsuarioSelect:Usuario[] = [];
-  auxEmpleadoSelect:Empleado[] = [];
-  auxSedeSelect:Sede[] = [];
-  auxTarifaSelect:Tarifa[] = [];
-
-  auxTarifaDos:any[] = []
-  auxCantTarifaSelect:any[] = []
-
-  auxTipoEntradaSelect:TipoEntrada[] = [];
-  auxTipoVisitaSelect:TipoVisita[] = [];
-  auxExposicionSelect:Exposiciones[] = [];
-  auxDetalleExposicionSelect:DetalleExposicion[] =[];
-  auxObraSelect:Obra[] = [];
-  auxReservaVisitaSelect:ReservasVisita[] = [];
-  auxEntradaSelect:Entrada[] = [];
-
-  auxCantEntradaSelect = 0;
+  
+  
+  //variables usadas para comunicar con el HTML
+  auxSedeSelect: Sede[] = [];
+  auxTarifaDos: Tarifa[] = [];
+  auxCantTarifaSelect: any[] = [];
   auxCantDuracion = 0;
-
-  auxCantEntradaVendidas = 0;
   auxCantEntradaDispo = 0;
   auxCantEntradas = 0;
-
-  guia_select=false;
-  guia_selected=false;
-
-
-  pantalla = 'A'
-
-  pruUsuario:any;
-  pruEmpleado:any;
- 
-  auxUsuariosSelect:any;
-  auxTarifasSelect:any;
+  guia_select = false;
+  auxTarifasSelect: any;
   fechas = "";
   horas = "";
 
-  constructor(private _sesionService:SesionService,
-              private _usuarioService:UsuarioService,
-              private _empleadoService:EmpleadoService,
-              private _sedeService:SedeService,
-              private _tarifasService:TarifaService,
-              private _tipoEntradaService:TipoEntradaService,
-              private _tipoVisitaService:TipoVisitaService,
-              private _exposicionService:ExposicionService,
-              private _detalleExposicionService:DetalleExposicionService,
-              private _obraService:ObraService,
-              private _reservaVisitaService:ReservaVisitaService,
-              private _entradaService:EntradaService
-              ){}
+  //pantalla empieza en A Primera pantalla
+  pantalla = 'A'
+
+  
+
+  constructor(private _sesionService: SesionService,
+    private _usuarioService: UsuarioService,
+    private _empleadoService: EmpleadoService,
+    private _sedeService: SedeService,
+    private _tarifasService: TarifaService,
+    private _tipoEntradaService: TipoEntradaService,
+    private _tipoVisitaService: TipoVisitaService,
+    private _exposicionService: ExposicionService,
+    private _detalleExposicionService: DetalleExposicionService,
+    private _obraService: ObraService,
+    private _reservaVisitaService: ReservaVisitaService,
+    private _entradaService: EntradaService,
+    private toastr: ToastrService
+  ) { }
 
 
-  ngOnInit():void{
+  ngOnInit(): void {
+    //al cargar la pagina se Obtiene las tablas una por una 
     this.obtenerSesiones();
     this.obtenerUsuarios();
     this.obtenerEmeplado();
@@ -114,123 +97,148 @@ export class AppComponent {
     this.obtenerObra();
     this.obtenerReservaVisita();
     this.obtenerEntrada();
-    this.auxUsuarioSelect = [];
-    
-
   }
 
-  obtenerSesiones(){
-    this._sesionService.getEmpleadoEnSesion().subscribe(data =>{
+  //funciones para traer las tablas del SQL por la Api
+  obtenerSesiones() {
+    this._sesionService.getEmpleadoEnSesion().subscribe(data => {
       this.sesion = data
-      
+
     })
   }
-  obtenerUsuarios(){
-    this._usuarioService.getListUsuario().subscribe(data =>{
+  obtenerUsuarios() {
+    this._usuarioService.getListUsuario().subscribe(data => {
       this.usuarios = data
-      
+
     })
   }
-  obtenerEmeplado(){
-    this._empleadoService.getListEmpleado().subscribe(data =>{
+  obtenerEmeplado() {
+    this._empleadoService.getListEmpleado().subscribe(data => {
       this.empleado = data
     })
   }
-  obtenerSede(){
-    this._sedeService.getListSedes().subscribe(data =>{
+  obtenerSede() {
+    this._sedeService.getListSedes().subscribe(data => {
       this.sede = data;
     })
   }
-  obtenerTarifa(){
-    this._tarifasService.getListTarifa().subscribe(data =>{
+  obtenerTarifa() {
+    this._tarifasService.getListTarifa().subscribe(data => {
       this.tarifa = data;
     })
   }
-  obtenerTipoEntrada(){
-    this._tipoEntradaService.getListTipoEntrada().subscribe(data =>{
+  obtenerTipoEntrada() {
+    this._tipoEntradaService.getListTipoEntrada().subscribe(data => {
       this.tipoEntrada = data;
     })
   }
-  obtenerTipoVisita(){
-    this._tipoVisitaService.getListTipoVisita().subscribe(data =>{
+  obtenerTipoVisita() {
+    this._tipoVisitaService.getListTipoVisita().subscribe(data => {
       this.tipoVisita = data;
     })
   }
-  obtenerExposicion(){
-    this._exposicionService.getListExposicion().subscribe(data =>{
+  obtenerExposicion() {
+    this._exposicionService.getListExposicion().subscribe(data => {
       this.exposicion = data;
     })
   }
-  obtenerDetalleExposicion(){
-    this._detalleExposicionService.getListDetalleExposicion().subscribe(data =>{
+  obtenerDetalleExposicion() {
+    this._detalleExposicionService.getListDetalleExposicion().subscribe(data => {
       this.detalleExposicion = data;
     })
   }
-  obtenerObra(){
-    this._obraService.getListObra().subscribe(data =>{
+  obtenerObra() {
+    this._obraService.getListObra().subscribe(data => {
       this.obra = data;
     })
   }
-  obtenerReservaVisita(){
-    this._reservaVisitaService.getListReservaVisita().subscribe(data =>{
+  obtenerReservaVisita() {
+    this._reservaVisitaService.getListReservaVisita().subscribe(data => {
       this.reservaVisita = data;
     })
   }
-  obtenerEntrada(){
-    this._entradaService.getListEntrada().subscribe(data =>{
+  obtenerEntrada() {
+    this._entradaService.getListEntrada().subscribe(data => {
       this.entrada = data;
     })
   }
 
 
- //----------------
-  nuevaVentaEntrada(){
+  //Al apretar el boton "Regitrar nueva venta de entrada"
+  nuevaVentaEntrada() {
+    
+    //cambia a la pantalla "B" donde muestra todas las tarifas
     this.pantalla = 'B'
-    //getEmpleadoEnSesion
     
-    //this.auxSesionSelect.push(this.sesion[0])
-    //console.log(this.auxSesionSelect[0].idUsuario)
-    //this.buscarUsuario(this.auxSesionSelect[0].idUsuario)
-      
-      
-     this.auxUsuariosSelect = this.buscarEmpleadoLogueado();
-     console.log(this.auxUsuariosSelect.idEmpleado)
+    //variables usadas para recuperar los datos de las funciones
+    let auxUsuario_IdEmpleado = 0
+    let auxSede_Id = 0
 
-     this.auxEmpleadoSelect = this.buscarSedeEmpleado(); 
-     console.log(this.auxEmpleadoSelect)  
-     
-     this.fechas = this.fecha()
+    //busca el empleado logeado
+    auxUsuario_IdEmpleado = this.buscarEmpleadoLogueado();
 
-     this.auxTarifasSelect = this.buscarTarifasSedeActual()
+    //con el IdEmpleado de la clase Usuario se lo paso por parametro para buscar la ID sede
+    auxSede_Id = this.buscarSedeEmpleado(auxUsuario_IdEmpleado);
+
+    //trae la fecha Actual
+    this.fechas = this.fecha()
     
-     console.log(this.auxTarifasSelect[0])
-     
+    //guardar todas las tarifas vigentes de la Sede y los guarda todos
+    // en el Arreglo auxTarifaSelect
+    this.auxTarifasSelect = this.buscarTarifasSedeActual(auxSede_Id)
+
   }
 
-  
-  buscarEmpleadoLogueado(){
-    let aux = new Sesion((this.sesion[0].id),
-                          this.sesion[0].idUsuario,
-                          this.sesion[0].fechaHoraInicio,
-                          this.sesion[0].fechaHoraFin,this.usuarios)
 
-    let usuarioSelect = aux.getEmpleadoEnSesion(this.usuarios)
+  buscarEmpleadoLogueado() {
+    //el empleado logeado es el de la posicion 0 de la tabla Sesion
+    //crea la clase Sesion con los datos de la posicion 0
+    let nuevaSesion = new Sesion(this.sesion[0].id,
+      this.sesion[0].idUsuario,
+      this.sesion[0].fechaHoraInicio,
+      this.sesion[0].fechaHoraFin,
+      this.usuarios)
 
+    //con los datos ingresados a la clase se usa la funcion para traer el ID_empleado
+    //de la clase Usuario
+    let usuarioSelect = nuevaSesion.getEmpleadoEnSesion()
     return usuarioSelect
   }
-  buscarSedeEmpleado(){
-    let aux = new Empleado(this.empleado)
 
-    let empleadoSelect = aux.getSedeDondeTrabaja(this.empleado,this.auxUsuariosSelect.idEmpleado)
-    return empleadoSelect
+  //buscar el empleado que tenga el ID igual a IDEmpleado del usuario
+  buscarSedeEmpleado(Usuario_IdEmpleado) {
+    for (let index = 0; index < this.empleado.length; index++) {
+      if (this.empleado[index].id === Usuario_IdEmpleado) {
+        let nuevoEmpleado = new Empleado(this.empleado[index].id,
+          this.empleado[index].idSede,
+          this.empleado[index].apellido,
+          this.empleado[index].codigoValidacion,
+          this.empleado[index].cuit,
+          this.empleado[index].dni,
+          this.empleado[index].domicilio,
+          this.empleado[index].fechaIngreso,
+          this.empleado[index].fechaNacimiento,
+          this.empleado[index].mail,
+          this.empleado[index].sexo,
+          this.empleado[index].telefono)
+        
+          //Busca Trae el IDSede donde te trabaja el empleado
+        let auxSede_Id = nuevoEmpleado.getSedeDondeTrabaja()
+        return auxSede_Id
+      }
+      
+    }
+
   }
-  fecha(){
+
+  //funcion para traer la fecha como cadena en string 
+  fecha() {
     var fecha = new Date()
     var fechaActual = ""
     var dia = fecha.getDate().toString();
-    var mes = (fecha.getMonth()+1).toString();
+    var mes = (fecha.getMonth() + 1).toString();
     var año = fecha.getFullYear().toString();
-    if ( dia.length <= 1) {
+    if (dia.length <= 1) {
       dia = "0" + dia
     }
     if (mes.length <= 1) {
@@ -239,7 +247,9 @@ export class AppComponent {
     fechaActual = dia + "/" + mes + "/" + año;
     return fechaActual
   }
-  hora(){
+
+  //funcion para traer la hora como cadena en string 
+  hora() {
     var tiempo = new Date()
     var horaActual = ""
     var hora = tiempo.getHours().toString();
@@ -258,507 +268,279 @@ export class AppComponent {
     return horaActual
   }
 
-  buscarTarifasSedeActual(){
-    let aux = new Sede(this.sede)
-    
-    let auxTarifaSelect = []
 
-    auxTarifaSelect = aux.buscarTarifasVigentes(this.sede,this.fechas,this.tarifa,this.auxEmpleadoSelect)
+  //buscar tarifas vigentes de la sede actual
+  buscarTarifasSedeActual(auxSede_Id) {
     
-    console.log(auxTarifaSelect)
+    //variable para guardar las tarifas vigentes
+    let auxTarifaSelect
 
+    //buscar en el arreglo de todas la sedes la que tenga id igual a la auxsede_id 
+    //pasada por parametro
+    for (let index = 0; index < this.sede.length; index++) {
+      if (this.sede[index].id == auxSede_Id) {
+        let sedeActual = new Sede(this.sede[index].id,
+                                  this.sede[index].nombre,
+                                  this.sede[index].cantMaxVisitates,
+                                  this.sede[index].cantMaxPorGuia,
+                                  this.tarifa,
+                                  this.exposicion)
+
+        //guarda la sede seleccionada en una varibale global para usarlas despues
+        this.auxSedeSelect.push(sedeActual)
+        
+        //guardar las tarifas vigentes de la sede pasandole la fecha como parametro
+        auxTarifaSelect = sedeActual.buscarTarifasVigentes(this.fechas)
+      }
+    }
     return auxTarifaSelect
-
   }
 
-  //-----------------
-  tomarSeleccionTarifa(item_id){
+  //cuando se selecciona en HTML la tarifa que elige
+  tomarSeleccionTarifa(item_id) {
+
+    //la pantalla "C" detalle de la tarifa seleccionada
     this.pantalla = 'C'
-    this.auxTarifaDos = item_id
-    console.log(item_id)
-    this.auxCantDuracion = this.calcularDuracionEstimadaVisitaCompleta(item_id)
+
+    //variables para calcular la cantidad de entradas disponibles
     let cantMaxVisitantes = 0
     let reservaVisitantes = 0
     let cantEntradaSede = 0
+
+    //se lo paso para que se pueda mostrar en el HTML
+    this.auxTarifaDos = item_id
+
+    //usar una variable global auxCantDuracion para usarlo en el HTML
+    this.auxCantDuracion = this.calcularDuracionEstimadaVisitaCompleta()
+    
+    //traer la cantidad de visitantes y reservas
     cantMaxVisitantes = this.buscarLimiteVisitantes();
     reservaVisitantes = this.buscarReservasSedeActual();
     cantEntradaSede = this.buscarEntradasSedeActual();
+
+    //usar una variable global auxCantEntradaDispo para usarla en el HTML
     this.auxCantEntradaDispo = cantMaxVisitantes - (reservaVisitantes + cantEntradaSede)
   }
 
-  calcularDuracionEstimadaVisitaCompleta(item_id){
+  calcularDuracionEstimadaVisitaCompleta() {
 
-    let aux = new Sede(this.sede)
-    let duracion = aux.esVigente(this.sede,this.fechas,item_id.id,this.exposicion,this.detalleExposicion,this.obra)
+    //usar la variable de auxSedeSelect que tiene la sede seleccionada en el posicion 0
+    let actualSede = new Sede(this.auxSedeSelect[0].id,
+                              this.auxSedeSelect[0].nombre,
+                              this.auxSedeSelect[0].cantMaxVisitates,
+                              this.auxSedeSelect[0].cantMaxPorGuia,
+                              this.auxTarifaDos,
+                              this.exposicion)
+
+    //buscar la duracion de la obra de la sede con exposicion vigente 
+    let duracion = actualSede.esVigente(this.fechas, this.detalleExposicion, this.obra)
+
     return duracion
 
   }
-  //----------------
 
+  //buscar limite maximo de visitantes de la sede seleccionada por dia 
+  buscarLimiteVisitantes() {
+    let actualSede = new Sede(this.auxSedeSelect[0].id,
+                              this.auxSedeSelect[0].nombre,
+                              this.auxSedeSelect[0].cantMaxVisitates,
+                              this.auxSedeSelect[0].cantMaxPorGuia,
+                              this.auxTarifaDos,
+                              this.exposicion)
 
+    let auxLimiteVisitantes = actualSede.getCantMaxVisitantes()
 
-  buscarLimiteVisitantes(){
-    let aux = new Sede(this.sede)
-    let auxLimiteVisitantes = aux.getCantMaxVisitantes(this.sede,this.auxTarifaDos)
     return auxLimiteVisitantes
   }
 
-  buscarReservasSedeActual(){
-    let aux = new ReservasVisita()
-    let reserva = aux.esSedeActual(this.reservaVisita,this.auxTarifaDos,this.fechas);
+  //buscar la reservas de la sede con la fecha de hoy
+  buscarReservasSedeActual() {
+
+    let fechaActual: any;
+    let fechaReserva: any;
+    let reserva = 0
+
+    fechaActual = this.fechas.slice(6, 10) + this.fechas.slice(3, 5) + this.fechas.slice(0, 2)
+    fechaActual = parseInt(fechaActual)
+
+    for (let index = 0; index < this.reservaVisita.length; index++) {
+      let reservaActual = new ReservasVisita(this.reservaVisita[index].id,
+        this.reservaVisita[index].numero,
+        this.reservaVisita[index].idExposicion,
+        this.reservaVisita[index].idSede,
+        this.reservaVisita[index].idEmpleadoCreador,
+        this.reservaVisita[index].cantidadAlumno,
+        this.reservaVisita[index].cantidadAlumnoConfirmado,
+        this.reservaVisita[index].fechaHoraCreacion,
+        this.reservaVisita[index].fechaHoraReserva,
+        this.reservaVisita[index].horaInicioReal,
+        this.reservaVisita[index].horaFinReal)
+
+      fechaReserva = this.reservaVisita[index].fechaHoraReserva.slice(6, 10) +
+        this.reservaVisita[index].fechaHoraReserva.slice(3, 5) +
+        this.reservaVisita[index].fechaHoraReserva.slice(0, 2)
+
+      fechaReserva = parseInt(fechaReserva)
+
+      if (fechaActual === fechaReserva) {
+        reserva = reserva + reservaActual.esSedeActual(this.auxSedeSelect[0].id);
+      }
+    }
+
     return reserva
   }
 
-  buscarEntradasSedeActual(){
-    let aux = new Entrada(0,0,0,0,0,0)
-    let countEntrada = aux.esSedeActual(this.auxTarifaDos,this.entrada)
+  //buscar las entradas vendidas de sede en el dia de hoy
+  buscarEntradasSedeActual() {
+
+    let fechaActual: any;
+    let fechaVentaEntrada: any;
+    let countEntrada = 0
+    
+    fechaActual = this.fechas.slice(6, 10) + this.fechas.slice(3, 5) + this.fechas.slice(0, 2)
+    fechaActual = parseInt(fechaActual)
+
+    for (let index = 0; index < this.entrada.length; index++) {
+      let auxEntradas = new Entrada(this.entrada[index].numero,
+                                    this.entrada[index].idSede,
+                                    this.entrada[index].idTarifa,
+                                    this.entrada[index].fechaVenta,
+                                    this.entrada[index].horaVenta,
+                                    this.entrada[index].monto)
+
+      fechaVentaEntrada = this.entrada[index].fechaVenta.slice(6, 10) +
+                          this.entrada[index].fechaVenta.slice(3, 5) +
+                          this.entrada[index].fechaVenta.slice(0, 2)
+
+      fechaVentaEntrada = parseInt(fechaVentaEntrada)
+      if (fechaActual === fechaVentaEntrada) {
+        auxEntradas.esSedeActual(this.auxSedeSelect[0].id)
+
+        if (auxEntradas.esSedeActual(this.auxSedeSelect[0].id) === true) {
+          countEntrada = countEntrada + 1
+        }
+      }
+    }
     return countEntrada
   }
 
-  
 
-  tomarSeleccionCantidadEntradas(){
+  //cuando se apreta el boton aceptar se toma la cantidad de entradas 
+  //que desea y mostrar el Detalle de la entrada
+  tomarSeleccionCantidadEntradas() {
     this.pantalla = 'D'
     for (let index = 0; index < this.auxCantEntradas; index++) {
+      
       //guardar la cantidad de tarifas segun la cantidad seleccionada
       this.auxCantTarifaSelect.push(this.auxTarifaDos)
     }
   }
 
-  tomarConfirmacionVenta(){
+  //al apretar el aceptar en el detalle de entrada confirma la entrada  
+  tomarConfirmacionVenta() {
+
+    //buscar el ultimo numero de las entradas vendidas
+    let ultimoNumero:number = this.buscarUltimoNumeroEntrada()
     
-    let ultimoNumero = this.buscarUltimoNumeroEntrada()
-    console.log(ultimoNumero)
 
     //de toda la coleccion de tarifa con la cantidad seleccionada
-    for (let index = 0; index < this.auxCantTarifaSelect.length; index++) { 
-      
+    for (let index = 0; index < this.auxCantTarifaSelect.length; index++) {
+
       let precio = 0
-      
+
       //si selecciona con guia calcular el precio con monto adicional con guia
       if (this.guia_select == true) {
         precio = this.auxCantTarifaSelect[index].monto + this.auxCantTarifaSelect[index].montoAdicionalGuia
       }
       //si no selecciona con guia calcular el precio sin monto adicional
       else {
-          precio = this.auxCantTarifaSelect[index].monto 
+        precio = this.auxCantTarifaSelect[index].monto
       }
 
-
-
-      const auxEntradaSelect:any= {
-        numero:0,
-        idSede:this.auxCantTarifaSelect[index].idSede,
-        idTarifa:this.auxCantTarifaSelect[index].id,
-        fechaVenta:this.fecha(),
-        horaVenta:this.hora(),
-        monto: precio
-      }
-        
-      //PUT a la base de datos la entrada la cantidad de veces del for de la cantidad seleccionada
-      
-      
+  
       //guardar en una variable los datos de la entrada de la tarifa seleccionada
-      let entradaSelect = new Entrada(ultimoNumero,this.auxCantTarifaSelect[index].idSede,this.auxCantTarifaSelect[index].id,this.fecha(),
-                                        this.hora(),precio)
-      entradaSelect.new(this._entradaService,auxEntradaSelect) 
+      let auxEntradaDos = new Entrada(ultimoNumero,
+                                      parseInt(this.auxCantTarifaSelect[index].idSede),
+                                      parseInt(this.auxCantTarifaSelect[index].id),
+                                      this.fecha(),
+                                      this.hora(),
+                                      precio)
+     
+       let ventaEntrada= auxEntradaDos.new(this._entradaService)
       
-      //PUT a la base de datos la entrada la cantidad de veces del for de la cantidad seleccionada
-      console.log("auxEntradaSelect",entradaSelect)
-      
+       //cartel de entrada vendida correctamente 
+      if (  ventaEntrada = 1) {
+        swal.fire("Entrada Vendida", "Se vendio correctamente la entrada", "success");
+      }
+      //cartel de que la entrada no fue vendida
+      else{
+        swal.fire("Error al vender la entrada", "No se pudo vender la entrada", "error");
+      }
       
     }
-
+    
+    //volver todas las variables a cero por si quiere volver a comprar entradas
     this.auxCantTarifaSelect = [];
     this.auxCantEntradas = 0;
-
-
-    this.auxTarifaDos= []
-
-
-    this.auxCantTarifaSelect = []
-  
-    this.auxTipoEntradaSelect = [];
-    this.auxTipoVisitaSelect = [];
-    this.auxExposicionSelect = [];
-    this.auxDetalleExposicionSelect =[];
-    this.auxObraSelect = [];
-    this.auxReservaVisitaSelect = [];
-    this.auxEntradaSelect = [];
-  
-    this.auxCantEntradaSelect = 0;
+    this.auxTarifaDos = []
     this.auxCantDuracion = 0;
-  
-    this.auxCantEntradaVendidas = 0;
     this.auxCantEntradaDispo = 0;
-    this.auxCantEntradas = 0;
     this.guia_select = false;
 
-
+    //volver a la pantalla de tarifas
     this.pantalla = "B"
 
   }
 
-  buscarUltimoNumeroEntrada(){
-    let ultimoNumero = 0
-    let aux = new Entrada(0,0,0,0,0,0)
-    ultimoNumero = aux.getNumero(this.entrada)
+  //buscar el ultimo numero 
+  buscarUltimoNumeroEntrada() {
+    let auxUltimoNumero = []
+    for (let index = 0; index < this.entrada.length; index++) {
+
+      let precio = this.entrada[index].monto
+      
+      let entradaNro = new Entrada(this.entrada[index].numero,
+                                          this.entrada[index].idSede,
+                                          this.entrada[index].idTarifa,
+                                          this.entrada[index].fechaVenta,
+                                          this.entrada[index].horaVenta,
+                                          precio)
+    
+      auxUltimoNumero.push(entradaNro.getNumero(this.auxSedeSelect[0].id)) 
+    }
+    let ultimoNumero = Math.max(...auxUltimoNumero)
     return ultimoNumero
   }
-  
-  VolverATarifas(){
+
+  //boton para volver a las tarifas y poner las variables a cero
+  VolverATarifas() {
     this.pantalla = "B"
     this.auxCantTarifaSelect = [];
     this.auxCantEntradas = 0;
-    this.auxTarifaDos= []
+    this.auxTarifaDos = []
+    this.auxCantDuracion = 0;
     this.auxCantEntradaDispo = 0;
     this.guia_select = false;
+
   }
-  GuiaSelect(){
+
+  //funcion para el checkbox de guia 
+  GuiaSelect() {
     if (this.guia_select == true) {
       this.guia_select = false
-      
+
     }
-    else{
+    else {
       this.guia_select = true
     }
-    console.log(this.guia_select)
   }
 
 }
 
-class Sesion {
-  id:number;
-  idUsuario:number;
-  fechaHoraInicio:string;
-  fechaHoraFin:string
-  
-  constructor(id,idUsuario,fechaHoraInicio,fechaHoraFin,usuarios)
-  {
-    this.id = id,
-    this.idUsuario = idUsuario,
-    this.fechaHoraInicio = fechaHoraInicio,
-    this.fechaHoraFin = fechaHoraFin
-  }
-  
-  getEmpleadoEnSesion(usu){
-    let selectUsuario = new Usuario()
-    let respUsuario = selectUsuario.conocerEmpleado(this.idUsuario,usu)
-    return respUsuario
-  }
-}
-
-class Usuario {
-    id:number;
-    nombre:string;
-    idEmpleado:number;
-    contraseña:string;
-    caducidad:string;
-
-  constructor()
-  {}
-  
-  conocerEmpleado(idUsuario,usu){
-    
-    console.log(idUsuario)
-      for (let index = 0; index < usu.length; index++) {
-        if(idUsuario == usu[index].id){
-          return usu[index]
-        }
-      }
-  }
-}
-
-class Empleado{
-  id:number;
-  idSede:number;
-  apellido:string;
-  codigoValidacion:number;
-  cuit:string;
-  dni:Date;
-  domicilio:string;
-  fechaIngreso:string;
-  fechaNacimiento:string;
-  mail:string;
-  sexo:string;
-  telefono:string;
-
-  constructor(empleado:Empleado[]){}
-
-  getSedeDondeTrabaja(empleado,empleado_IdSede){
-    for (let index = 0; index < empleado.length; index++) {
-      if (empleado_IdSede == empleado[index].id) {
-        return empleado[index]
-      }
-    }
-  }
 
 
 
-}
 
-class Sede{
-  id:number;
-  nombre:string;
-  cantMaxVisitates:number;
-  cantMaxPorGuia:number;
-
-  constructor(sede:Sede[]){}
-
-  buscarTarifasVigentes(sede,fecha,tarifa,empleado_idSede){
-    for (let index = 0; index < sede.length; index++) {
-      if (empleado_idSede.id == sede[index].id) {
-        let auxTarifas = new Tarifa(tarifa)
-        console.log(sede[index].id)
-        let respTarifa = auxTarifas.esVigente(tarifa,fecha,sede[index].id)
-        console.log(respTarifa)
-        return respTarifa
-        
-      }
-    }
-  }
-
-  esVigente(sede,fecha,tarifa_idSede,exposicion,detalleExposicion,obra){
-    for (let index = 0; index < sede.length; index++) {
-      if (tarifa_idSede == sede[index].id) {
-        let aux = new Exposiciones(exposicion)
-        let duracion = aux.buscarDuracionExtendidaObra(fecha,sede[index].id,exposicion,detalleExposicion,obra)
-        return duracion
-      }
-      
-    }
-
-  }
-
-  getCantMaxVisitantes(sede,tarifa_select){
-    for (let index = 0; index < sede.length; index++) {
-      if (tarifa_select.idSede == sede[index].id) {
-        return sede[index].cantMaxVisitates
-      }
-      
-    }
-    
-  }
-}
-
-class Tarifa{
-  id:number;
-  idSede:number;
-  idTipoEntrada:number;
-  idTipoVisita:number;
-  fechaInicioVigencia:string;
-  fechaFinVigencia:string;
-  monto:number;
-  montoAdicionalGuia:number;
-
-  constructor(tarifa:Tarifa[]){}
-
-  esVigente(tarifa,fecha,sede_idSede){
-    let dia = parseInt(fecha.slice(0,2))
-    let mes = parseInt(fecha.slice(3,5))
-    let año = parseInt(fecha.slice(6,10))
-    
-    let tarifasVigentes:Tarifa[] = []
-
-    for (let index = 0; index < tarifa.length; index++) {
-
-      let diaIn = parseInt(tarifa[index].fechaInicioVigencia.slice(0,2));
-      let mesIn = parseInt(tarifa[index].fechaInicioVigencia.slice(3,5));
-      let añoIn = parseInt(tarifa[index].fechaInicioVigencia.slice(6,10));
-
-      let diaVen = parseInt(tarifa[index].fechaFinVigencia.slice(0,2))
-      let mesVen = parseInt(tarifa[index].fechaFinVigencia.slice(3,5))
-      let añoVen =  parseInt(tarifa[index].fechaFinVigencia.slice(6,10))
-
-      if ( (tarifa[index].idSede == sede_idSede) 
-      && (añoIn <= año && mesIn <= (mes+1) && diaIn <= dia) && 
-        (añoVen >= año && mesVen >= (mes+1) && diaVen >= dia)){
-        console.log(tarifa[index])
-        
-        
-        tarifasVigentes.push(tarifa[index])
-      }
-    }
-    return tarifasVigentes
-
-  }
-}
-
-class Exposiciones{
-  id:number;
-  nombre:string;
-  idEmpleadoCreador:number;
-  idSede:number;
-  fechaInicio:string;
-  fechaInicioReplanificada:string;
-  fechaFin:string;
-  fechaFinReplanificada:string;
-  horaApertura:string;
-  horaCierra:string;
-
-  constructor(exposicion:Exposiciones){}
-
-  buscarDuracionExtendidaObra(fecha,id,exposicion,detalleExposicion,obra){
-    
-    let dia = parseInt(fecha.slice(0,2))
-    let mes = parseInt(fecha.slice(3,5))
-    let año = parseInt(fecha.slice(6,10))
-
-    let resp = 0;
-
-    for (let index = 0; index < exposicion.length; index++) {
-
-      //Guardar el dia inicio, mes inicio, año inicio de la exposicion
-      let diaIn = parseInt(exposicion[index].fechaInicio.slice(0,2))
-      let mesIn = parseInt(exposicion[index].fechaInicio.slice(3,5))
-      let añoIn = parseInt(exposicion[index].fechaInicio.slice(6,10))
-      
-      //Guardar el dia fin, mes fin, año fin de la exposicion
-      let diaVen = parseInt(exposicion[index].fechaFin.slice(0,2))
-      let mesVen = parseInt(exposicion[index].fechaFin.slice(3,5))
-      let añoVen = parseInt(exposicion[index].fechaFin.slice(6,10))
-
-      if ((id == exposicion[index].idSede) && 
-          (añoIn <= año && mesIn <= mes && diaIn <= dia) && 
-          (añoVen >= año && mesVen >= mes  && diaVen >= dia))
-      {
-        let aux = new DetalleExposicion(detalleExposicion)
-        resp = resp + aux.getDuracionExtendida(exposicion[index].id,detalleExposicion,obra)
-        
-      }
-    }
-    return resp
-  }
-}
-
-class DetalleExposicion{
-  id:number;
-  idExposicion:number;
-  idObra:number;
-  lugarAsignado:string;
-
-  constructor(detalleExposicion:DetalleExposicion){}
-
-  getDuracionExtendida(expo_id,detalleExpo,obra){
-    let duracion = 0
-    for (let index = 0; index < detalleExpo.length; index++) {
-      if (expo_id == detalleExpo[index].idExposicion){
-        let aux = new Obra(obra)
-        duracion = duracion + aux.getDuracion(detalleExpo[index].idObra,obra)
-        console.log(duracion)
-      }
-    }
-    return duracion
-  }
-}
-
-class Obra{
-  id:number;
-  nombre:string;
-  descripcion:string;
-  idEmpleadoCreador:number;
-  alto:number;
-  ancho:number;
-  peso:number;
-  valuacion:number;
-  fechaCreacion:string;
-  fechaPrimerIngreso:string;
-  codigoSensor:number;
-  duracionExtendida:number;
-  duracionResumida:number;
-
-  constructor(obra:Obra){}
-
-  getDuracion(detalle_idObra,obra){
-    let cantDuracion = 0
-    for (let index = 0; index < obra.length; index++) {
-      if (detalle_idObra == obra[index].id) {
-        console.log(obra[index])
-        cantDuracion = cantDuracion + obra[index].duracionExtendida
-        
-      }
-    }
-    return cantDuracion
-  }
-}
-
-class ReservasVisita{
-  id:number;
-  numero:number;
-  idExposicion:number;
-  idSede:number;
-  idEmpleadoCreador:number;
-  cantidadAlumno:number;
-  cantidadAlumnoConfirmado:number;
-  fechaHoraCreacion:string;
-  fechaHoraReserva:string;
-  horaInicioReal:string;
-  horaFinReal:string;
-
-  constructor(){}
-
-  esSedeActual(reservaVisita,sede,fecha){
-    let countReserva = 0
-
-    let dia = parseInt(fecha.slice(0,2))
-    let mes = parseInt(fecha.slice(3,5))
-    let año = parseInt(fecha.slice(6,10))
-    
-    for (let index = 0; index < reservaVisita.length; index++) {
-
-      let diaIn = parseInt(reservaVisita[index].fechaHoraReserva.slice(0,2))
-      let mesIn = parseInt(reservaVisita[index].fechaHoraReserva.slice(3,5))
-      let añoIn = parseInt(reservaVisita[index].fechaHoraReserva.slice(6,10))
-      if (sede.id == reservaVisita[index].idSede && 
-        (añoIn == año && mesIn == mes && diaIn == dia) ) {
-        
-        countReserva += 1
-      }
-    }
-
-    return countReserva
-  }
-}
-
-class Entrada{
-  numero:number;
-    idSede:number;
-    idTarifa:number;
-    fechaVenta:string;
-    horaVenta:string;
-    monto:number;
-
-  constructor(numero,idSede,idTarifa,fechaVenta,horaVenta,monto){
-    this.numero = numero;
-    this.idSede = idSede;
-    this.idTarifa = idTarifa;
-    this.fechaVenta = fechaVenta;
-    this.horaVenta = horaVenta;
-    this.monto = monto;
-  }
-
-  esSedeActual(sede,entrada){
-    let contEntrada = 0
-    for (let index = 0; index < entrada.length; index++) {
-      if (sede.id == entrada[index].idSede) {
-        contEntrada += 1
-      }
-    }
-    return contEntrada
-  }
-
-  getNumero(entrada){
-    let auxCont = entrada.length
-    return auxCont
-  }
-
-  new(_entradaService,entradaSelect){
-
-    _entradaService.guardarEntrada(entradaSelect).subscribe(data =>{
-      console.log(data)
-    })
-  }
-}
 
 
 

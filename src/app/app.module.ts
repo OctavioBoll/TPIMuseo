@@ -9,15 +9,22 @@ import { HttpClientModule } from '@angular/common/http';
 
 import {FormsModule} from '@angular/forms'
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { ToastrModule,ToastNoAnimationModule,ToastNoAnimation } from 'ngx-toastr';
+
 @NgModule({
   declarations: [
     AppComponent
   ],
+
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

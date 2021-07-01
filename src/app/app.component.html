@@ -1,5 +1,17 @@
-<button class="btn btn-dark" (click)="nuevaVentaEntrada()">boton</button>
+<nav class="navbar navbar-dark bg-dark">
+  <div class="col-12 d-flex justify-content-end">
+    <a class="navbar-brand">Usuario: Admin</a>
+  </div>
+</nav>
+<h1 class="text text-center">Venta De Entradas</h1>
 
+<!--Pantalla de boton registrar venta entrada-->
+<div class="col-12 d-flex justify-content-center" *ngIf="pantalla == 'A'">
+  <button class="btn btn-primary" (click)="nuevaVentaEntrada()">Registrar Venta de Entradas</button>
+</div>
+
+
+<!--Pantalla de la tarifas-->
 <div *ngIf="pantalla == 'B'">
   <div *ngFor='let item of auxTarifasSelect'>
 
@@ -36,10 +48,11 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
+
+<!--Pantalla con detalle de la tarifa-->
 <div *ngIf="pantalla == 'C'">
   <div class="d-flex justify-content-center">
     <div class="card bg-primary" style="width: 30rem;">
@@ -53,7 +66,6 @@
         <p>Monto Adicional Por Guia: {{auxTarifaDos.montoAdicionalGuia}} <input class="m-1" type="checkbox" value="guia_select" (change)="GuiaSelect()"> Agregar Guia </p> 
         <p>Duracion de Estimada: {{auxCantDuracion}}Min</p>
         <p>Entradas Disponibles: {{auxCantEntradaDispo}}</p>
-        <p>guia: {{guia_select}}</p>
         <input type="number" placeholder="Cantidad" [(ngModel)]="auxCantEntradas">
         <div *ngIf="auxCantEntradaDispo >= 0 && auxCantEntradaDispo >= auxCantEntradas">
           <div class="d-flex justify-content-center m-2">
@@ -71,6 +83,7 @@
   </div>
 </div>
 
+<!--Pantalla de detalle de la entrada-->
 <div *ngIf="pantalla == 'D'">
   <div class="row ">
     <div class="d-flex justify-content-center">
@@ -115,129 +128,4 @@
 
 
 
-<!--
-<nav class="navbar navbar-dark bg-dark">
-  <div class="col-12 d-flex justify-content-end">
-    <a class="navbar-brand">Usuario: Admin</a>
-  </div>
-</nav>
-<h1 class="text text-center">Venta De Entradas</h1>
 
-<div class="col-12 d-flex justify-content-center" *ngIf="pantalla == 'A'">
-  <button class="btn btn-primary" (click)="nuevaVentaEntrada()">Registrar Venta de Entradas</button>
-</div>
-
-
-<div *ngIf="pantalla == 'B'">
-
-  <div *ngFor='let item of auxTarifaSelect'>
-
-    <div class="row">
-      <div class="d-flex justify-content-center">
-        <div class="col-11">
-          <div class="card">
-            <div class="card-header bg-primary">
-              <div class="row">
-                <div class="col-1">
-                  Numero: {{item.id}}
-                </div>
-                <div class="col-3">
-                  <p>Tipo Entrada: {{tipoEntrada[item.idTipoEntrada-1].nombre}}</p>
-                </div>
-                <div class="col-3">
-                  <p>Tipo Visita: {{tipoVisita[item.idTipoVisita-1].nombre}}</p>
-                </div>
-                <div class="col-1">
-                  <p>Guia: {{item.montoAdicionalGuia}}</p>
-
-                </div>
-                <div class="col-2">
-                  <p>Monto: {{item.monto}}</p>
-
-                </div>
-                <div class="col-2 ">
-                  <button class="btn btn-dark d-flex justify-content-end"
-                    (click)="tomarSeleccionTarifa(item.id)">Seleccionar</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<div *ngIf="pantalla == 'C'">
-  <div class="d-flex justify-content-center">
-    <div class="card bg-primary" style="width: 30rem;">
-      <div class="card-header">
-        <h1>Numero Tarifa: {{auxTarifaDos.id}}</h1>
-      </div>
-      <div class="card-body">
-        <p>Tipo de Entrada: {{tipoEntrada[auxTarifaDos.idTipoEntrada-1].nombre}}</p>
-        <p>Tipo de Visita: {{tipoVisita[auxTarifaDos.idTipoVisita-1].nombre}}</p>
-        <p>Monto: {{auxTarifaDos.monto}}</p>
-        <p>Monto Adicional Por Guia: {{auxTarifaDos.montoAdicionalGuia}} <input class="m-1" type="checkbox" value="guia_select" (change)="GuiaSelect()"> Agregar Guia </p> 
-        <p>Duracion de Estimada: {{auxCantDuracion}}hs</p>
-        <p>Entradas Disponibles: {{auxCantEntradaDispo}}</p>
-        <p>guia: {{guia_select}}</p>
-        <input type="number" placeholder="Cantidad" [(ngModel)]="auxCantEntradas">
-        <div *ngIf="auxCantEntradaDispo >= 0 && auxCantEntradaDispo >= auxCantEntradas">
-          <div class="d-flex justify-content-center m-2">
-            <button class="btn btn-dark btn-block" style="width: 25rem;" (click)="DetalleEntradas()">Comprar</button>
-          </div>
-        </div>
-        <div *ngIf="0 >= auxCantEntradaDispo || auxCantEntradas > auxCantEntradaDispo">
-          <p> No Hay Entradas Disponibles</p>
-        </div>
-        <div class="d-flex justify-content-center m-2">
-          <button class="btn btn-danger btn-block" style="width: 25rem;" (click)="VolverATarifas()" >Volver</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div *ngIf="pantalla == 'D'">
-  <div class="row ">
-    <div class="d-flex justify-content-center">
-      <div class="col-6  ">
-        <table class="table table-bordered table-dark table-hover">
-          <thead>
-            <tr>
-              <th>Tipo Entrada</th>
-              <th>Tipo Visita</th>
-              <th>Monto</th>
-              <th>Monto Adicional</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of auxCantTarifaSelect">
-              <th>{{tipoEntrada[item.idTipoEntrada-1].nombre}}</th>
-              <th>{{tipoVisita[item.idTipoVisita-1].nombre}}</th>
-              <th>{{item.monto}}</th>
-              <div *ngIf="guia_select">
-                <th>{{item.montoAdicionalGuia}}</th>
-              </div>
-              <div *ngIf="guia_select == false">
-                <th>0</th>
-              </div>
-               
-            </tr>
-          </tbody>
-          <tr class="bg-dark">
-            <th *ngIf="guia_select == true">Monto Total: {{(auxCantTarifaSelect[0].monto * auxCantEntradas) +
-              (auxCantTarifaSelect[0].montoAdicionalGuia * auxCantEntradas)}}</th>
-            <th *ngIf = "guia_select == false">Monto Total: {{(auxCantTarifaSelect[0].monto * auxCantEntradas)}}</th>
-          </tr>
-        </table>
-        <button class="btn btn-success" (click)="ComprarEntradas()">Aceptar</button>
-        <button class="btn btn-danger" (click)="VolverATarifas()">Cancelar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
--->
